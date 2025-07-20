@@ -1,0 +1,2 @@
+The script will show the most recent timestamp from your "CLM Logs" data for Bench 1 (17-09-12-09) and display both PIC MPD and MUX MPD values side by side for all 16 channels, making it easy to compare the values and spot any significant differences between the two measurement types.
+Clone the repo and run it in Visual Studio and make sure the latest CLM Logs google sheet is downloaded in the local folder where the dashboard.py is located.

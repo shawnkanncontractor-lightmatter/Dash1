@@ -269,5 +269,99 @@ def plot_latest_values_only():
     print(f"MUX MPD - Latest Average: {np.mean(latest_mux):.1f}")
     print(f"Average Difference: {np.mean(latest_pic - latest_mux):+.1f}")
 
+def plot_all_values():
+    """Create plots showing all PIC MPD and MUX MPD values across all time periods"""
+    # Parse the data
+    timestamps, pic_data, mux_data = parse_clm_data('CLM Logs - Bench 1.csv')
+    
+    # Convert to numpy arrays
+    pic_array = np.array(pic_data)
+    mux_array = np.array(mux_data)
+    
+    # Create figure with just line plots - no heatmaps
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 10))
+    fig.suptitle('All PIC MPD and MUX MPD Values - Complete Timeline', fontsize=16, fontweight='bold')
+    
+    # Plot 1: All PIC MPD values over time (line plot)
+    channels = list(range(16))
+    x_pos = range(len(timestamps))
+    
+    for ch in channels:
+        ax1.plot(x_pos, pic_array[:, ch], 'o-', label=f'Ch{ch}', alpha=0.7, markersize=4)
+    
+    ax1.set_title('All PIC MPD Values Over Time', fontsize=14, pad=15)
+    ax1.set_xlabel('Time Sample')
+    ax1.set_ylabel('PIC MPD Value')
+    ax1.grid(True, alpha=0.3)
+    ax1.set_xticks(x_pos)
+    ax1.set_xticklabels([t[:8] for t in timestamps], rotation=45, ha='right')
+    ax1.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=10)
+    
+    # Plot 2: All MUX MPD values over time (line plot)
+    for ch in channels:
+        ax2.plot(x_pos, mux_array[:, ch], 's-', label=f'Ch{ch}', alpha=0.7, markersize=4)
+    
+    ax2.set_title('All MUX MPD Values Over Time', fontsize=14, pad=15)
+    ax2.set_xlabel('Time Sample')
+    ax2.set_ylabel('MUX MPD Value')
+    ax2.grid(True, alpha=0.3)
+    ax2.set_xticks(x_pos)
+    ax2.set_xticklabels([t[:8] for t in timestamps], rotation=45, ha='right')
+    ax2.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=10)
+    
+    plt.tight_layout()
+    plt.show()
+    
+    # Print all values in a comprehensive table
+    print("\n" + "="*80)
+    print("ALL PIC MPD AND MUX MPD VALUES - COMPLETE DATA")
+    print("="*80)
+    
+    # Print header
+    print(f"{'Time':<12}", end="")
+    for ch in channels:
+        print(f"PIC{ch:2d} MUX{ch:2d}", end="  ")
+    print()
+    print("-" * 80)
+    
+    # Print all data
+    for i, timestamp in enumerate(timestamps):
+        print(f"{timestamp[:8]:<12}", end="")
+        for ch in channels:
+            print(f"{pic_array[i, ch]:4d} {mux_array[i, ch]:4d}", end="  ")
+        print()
+    
+    # Print summary statistics for each time period
+    print("\n" + "="*60)
+    print("SUMMARY STATISTICS BY TIME PERIOD")
+    print("="*60)
+    print(f"{'Time':<12} {'PIC Avg':<8} {'PIC Max':<8} {'MUX Avg':<8} {'MUX Max':<8} {'Diff Avg':<8}")
+    print("-" * 60)
+    
+    for i, timestamp in enumerate(timestamps):
+        pic_avg = np.mean(pic_array[i, :])
+        pic_max = np.max(pic_array[i, :])
+        mux_avg = np.mean(mux_array[i, :])
+        mux_max = np.max(mux_array[i, :])
+        diff_avg = pic_avg - mux_avg
+        
+        print(f"{timestamp[:8]:<12} {pic_avg:6.1f}   {pic_max:6d}   {mux_avg:6.1f}   {mux_max:6d}   {diff_avg:+6.1f}")
+    
+    # Print overall statistics
+    print("\n" + "="*50)
+    print("OVERALL STATISTICS (ALL TIME PERIODS)")
+    print("="*50)
+    print("PIC MPD Statistics:")
+    print(f"  Mean: {np.mean(pic_array):.2f}")
+    print(f"  Std:  {np.std(pic_array):.2f}")
+    print(f"  Min:  {np.min(pic_array)}")
+    print(f"  Max:  {np.max(pic_array)}")
+    print("\nMUX MPD Statistics:")
+    print(f"  Mean: {np.mean(mux_array):.2f}")
+    print(f"  Std:  {np.std(mux_array):.2f}")
+    print(f"  Min:  {np.min(mux_array)}")
+    print(f"  Max:  {np.max(mux_array)}")
+    print(f"\nAverage Difference (PIC - MUX): {np.mean(pic_array - mux_array):+.2f}")
+
 if __name__ == "__main__":
-    plot_latest_values_only()  # Changed from create_dashboard()
+    plot_all_values()  # Changed to show all values
